@@ -50,6 +50,9 @@ main{max-width:1600px;padding:clamp(12px,2.5vw,30px);margin:auto}.layout{grid-te
 .alert{background:#2b3024;border-radius:5px;padding:10px 12px}.iso{border:1px solid #a48b53;border-radius:7px;box-shadow:0 5px 15px #0006;overflow:hidden}.realm>.m{margin-top:10px}.tabs{gap:6px;margin-bottom:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.tabs button{min-height:40px;padding:7px 4px;border:1px solid #927442;font-weight:700}.tabs button.alt{border-color:#514b37;background:#171e17;color:#d8d0b9}.tabs button.alt:hover{background:#343d2c}button{background:linear-gradient(#e5c47e,#c3994c);border:1px solid #e1ba70;border-radius:5px;font-weight:600}button.alt{background:#2b3428;border-color:#544d38}button:not(:disabled):hover{filter:brightness(1.13)}.row{padding:10px 0}.card h2{font-family:Georgia,serif;font-size:1.25rem;color:#efd59b}.bar{height:9px;background:#141a14}.bar i{background:linear-gradient(90deg,#9e3c32,#e88861)}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.top{align-items:flex-start}.res{width:100%;gap:5px}.section-heading small{font-size:11px}.realm,.card{padding:10px}header{position:relative}}
 
+
+.map-tools{display:flex;align-items:center;gap:6px;margin:8px 0;flex-wrap:wrap}.map-tools button{min-height:30px}.map-tools span{font:12px Verdana;color:var(--gold)}.map-tools button[aria-pressed=true]{outline:2px solid #f3ddab}.pan-mode,.pan-mode svg g{cursor:grab!important}.pan-mode{touch-action:none}.iso svg [data-a=tile]:hover>polygon{stroke:#f9df94;stroke-width:2}.monster-bob{animation:bob .7s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-2px)}}@media(prefers-reduced-motion:reduce){.monster-bob{animation:none}}
+@media(min-width:851px){main{padding:12px 24px}.layout{margin-top:10px}.iso svg{max-height:calc(100vh - 295px);min-height:260px;background:#304c30}.card{max-height:calc(100vh - 170px);overflow:auto}}
 </style>
 </head>
 <body>
@@ -57,10 +60,10 @@ main{max-width:1600px;padding:clamp(12px,2.5vw,30px);margin:auto}.layout{grid-te
 <main>
 <div id="goal"></div>
 <div class="layout">
- <section class="realm"><div class="section-heading"><span>YOUR KINGDOM</span><small>Village overview</small></div><div id="raid" class="alert" style="margin-bottom:8px"></div><div class="iso" id="grid"></div><p class="m">Coin bubbles mean goods are ready. Tap the building to collect.</p></section>
+ <section class="realm"><div class="section-heading"><span>YOUR KINGDOM</span><small>Village overview</small></div><div id="raid" class="alert" style="margin-bottom:8px"></div><div class="map-tools"><button id="zoomOut" aria-label="Zoom out">−</button><span id="zoomRead">100%</span><button id="zoomIn" aria-label="Zoom in">+</button><button id="panToggle" aria-pressed="false">Drag map</button><button id="zoomReset">Reset view</button></div><div class="iso" id="grid"></div><p class="m">Coin bubbles mean goods are ready. Tap the building to collect.</p></section>
  <section class="card"><div class="section-heading"><span>COMMAND CENTER</span><small>Manage your realm</small></div><div class="tabs" id="tabs"></div><div id="panel"></div></section>
 </div>
 </main>
-<script src="game.js"></script>
+<script src="game.js?v=2.2"></script>
 </body>
 </html>

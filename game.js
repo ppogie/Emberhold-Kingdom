@@ -141,21 +141,32 @@ function art(x,cx,cy){const sp=spr(x);if(sp&&x.t!=="farm")return img(sp,cx,cy);s
  case"wall":return cube(cx,cy,28,8,"#a9aeb2","#8b9094","#c0c5c8")}return""}
 function tileSVG(x,i,cx,cy){
  const sl=sel===i,ev=(i%10+Math.floor(i/10))%2;
- let s=`<g data-a="tile" data-v="${i}" role="button" aria-label="${x?BT[x.t].n:"Empty plot"}" style="cursor:pointer"><polygon points="${cx},${cy-16} ${cx+32},${cy} ${cx},${cy+16} ${cx-32},${cy}" fill="${ev?"var(--g1)":"var(--g2)"}" stroke="${sl||(mv>=0&&!x)?"var(--gold)":"#0001"}" stroke-width="${sl?3:(mv>=0&&!x?2:1)}"/>`;
- if(x){s+=`<g opacity="${(x.b||mv===i)?.45:1}">${art(x,cx,cy)}</g>`;const sp0=spr(x),top=sp0?cy+17-sp0.h-6:cy-ART_H[x.t]-8;
+ let s=`<g data-a="tile" data-v="${i}" role="button" aria-label="${x?BT[x.t].n:"Empty plot"}" style="cursor:pointer"><polygon points="${cx},${cy-16} ${cx+32},${cy} ${cx},${cy+16} ${cx-32},${cy}" fill="${["#668a45","#71964b","#698e46","#75974c"][(i*13+Math.floor(i/10))%4]}" stroke="${sl||(mv>=0&&!x)?"var(--gold)":"#0001"}" stroke-width="${sl?3:(mv>=0&&!x?2:1)}"/>`;
+ if(x){s+=`<ellipse cx="${cx}" cy="${cy+8}" rx="25" ry="9" fill="#152519" opacity=".32" pointer-events="none"/><g opacity="${(x.b||mv===i)?.45:1}">${art(x,cx,cy)}</g>`;const sp0=spr(x),top=sp0?cy+17-sp0.h-6:cy-ART_H[x.t]-8;
   if(x.b)s+=`<rect x="${cx-16}" y="${top}" width="32" height="5" rx="2" fill="#0008"/><rect x="${cx-16}" y="${top}" width="${32*(1-x.b/x.bt)}" height="5" rx="2" fill="#8fc16a"/>`;
   else{const st=Math.floor(x.s||0);if(st>=5)s+=`<circle cx="${cx}" cy="${top}" r="10" fill="#e8b94a" stroke="#2b2008"/><text x="${cx}" y="${top+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#2b2008">${st}</text>`}
   if(x.lv>1)s+=`<circle cx="${cx-24}" cy="${cy+4}" r="8" fill="#000a"/><text x="${cx-24}" y="${cy+8}" text-anchor="middle" font-size="10" fill="#fff">${x.lv}</text>`}
  return s+"</g>"}
+let camera={z:1,x:288,y:166};
 function iso(){
- let s=`<svg viewBox="0 0 576 332" role="img" aria-label="Your village" style="width:100%;height:auto;display:block"><rect width="576" height="332" fill="var(--g2)"/>`;
- [[26,50],[40,300],[548,60],[540,300],[300,326],[18,170],[560,180]].forEach(([x,y])=>s+=tree(x,y));
+ let s=`<svg viewBox="${camera.x-288/camera.z} ${camera.y-166/camera.z} ${576/camera.z} ${332/camera.z}" role="img" aria-label="Your village" style="width:100%;height:auto;display:block"><defs><radialGradient id="land"><stop stop-color="#72974d"/><stop offset="1" stop-color="#304c30"/></radialGradient><pattern id="grass" width="19" height="17" patternUnits="userSpaceOnUse"><path d="M3 8l2 -4 1 4m9 6l1 -3 2 3" stroke="#d0db82" stroke-opacity=".19" fill="none"/></pattern></defs><rect width="576" height="332" fill="url(#land)"/><rect width="576" height="332" fill="url(#grass)"/>`;
+ [[26,50],[40,300],[548,60],[540,300],[300,326],[18,170],[560,180],[65,65],[90,38],[130,25],[485,35],[520,85],[50,265],[100,295],[470,300],[510,268],[550,245]].forEach(([x,y])=>s+=tree(x,y));
+ for(let i=0;i<55;i++){let x=(i*97+13)%576,y=(i*53+7)%332; if(Math.abs(x-288)/285+Math.abs(y-165)/145>1.05)s+=`<ellipse cx="${x}" cy="${y}" rx="4" ry="2" fill="${i%3?'#456b36':'#8d9480'}"/><circle cx="${x+2}" cy="${y-2}" r="1" fill="#c5c18a"/>`;}
  if(S.dragon)s+=dragonArt(70,110);
  const key=i=>i%10+Math.floor(i/10);
  S.g.map((x,i)=>i).sort((a,b)=>key(a)-key(b)).forEach(i=>{const c=i%10,r=Math.floor(i/10);s+=tileSVG(S.g[i],i,(c-r)*32+256,(c+r)*16+52)});
  s+=`<g pointer-events="none">`;S.g.forEach((x,i)=>{if(x&&!x.b&&!S.quest){const c=i%10,r=Math.floor(i/10),cx=(c-r)*32+256,cy=(c+r)*16+52;if(x.t==="barracks")s+=squad(cx,cy);if(x.t==="hall")s+=heroSVG(cx,cy)}});
- {const pr=Math.min(1,Math.max(0,1-S.raidIn/100)),O=[[0,0],[-28,-12],[-52,6],[-78,-4]];enemyGroup(S.wave+1).slice(0,4).map((m,j)=>[m,O[j]]).sort((a,b)=>a[1][1]-b[1][1]).forEach(([m,o])=>{s+=sdraw(m,40+190*pr+o[0],62+95*pr+o[1])})}
+ {const pr=Math.min(1,Math.max(0,1-S.raidIn/100)),O=[[0,0],[-28,-12],[-52,6],[-78,-4]];enemyGroup(S.wave+1).slice(0,4).map((m,j)=>[m,O[j]]).sort((a,b)=>a[1][1]-b[1][1]).forEach(([m,o])=>{s+=`<g class="monster-bob">${sdraw(m,40+190*pr+o[0],62+95*pr+o[1])}</g>`})}
  return s+"</g></svg>"}
 function save(){try{S.ts=Date.now();localStorage.setItem("emberhold2",JSON.stringify(S))}catch(e){}}
 function load(){try{const j=localStorage.getItem("emberhold2");if(!j)return;S=Object.assign(fresh(),JSON.parse(j));const away=Math.min(7200,Math.floor((Date.now()-(S.ts||Date.now()))/1000));if(away>30){const ef=effv();S.g.forEach(x=>{if(!x)return;if(x.b>0){x.b-=away;if(x.b<=0)fin(x)}const d=BT[x.t];if(d.p&&!x.b)x.s=Math.min(CAP,(x.s||0)+d.r*(1+.4*(x.lv-1))*(d.w?ef:1)*away*.5)});S.raidIn=Math.max(S.raidIn,30);log(`Welcome back! After ${Math.floor(away/60)} min away, your buildings kept working at half pace.`,"win")}}catch(e){}}
 load();draw();setInterval(tick,1000);
+
+function updateCamera(){const v=$("grid").querySelector("svg");if(v)v.setAttribute("viewBox",`${camera.x-288/camera.z} ${camera.y-166/camera.z} ${576/camera.z} ${332/camera.z}`);$("zoomRead").textContent=Math.round(camera.z*100)+"%";}
+function clampCamera(){camera.x=Math.max(288/camera.z,Math.min(576-288/camera.z,camera.x));camera.y=Math.max(166/camera.z,Math.min(332-166/camera.z,camera.y));}
+function zoomBy(n){camera.z=Math.max(1,Math.min(2.5,camera.z+n));clampCamera();updateCamera();}
+$("zoomIn").onclick=()=>zoomBy(.25);$("zoomOut").onclick=()=>zoomBy(-.25);$("zoomReset").onclick=()=>{camera={z:1,x:288,y:166};updateCamera()};
+let pan=null,panMode=false;const mapEl=$("grid");$("panToggle").onclick=()=>{panMode=!panMode;$("panToggle").setAttribute("aria-pressed",String(panMode));mapEl.classList.toggle("pan-mode",panMode)};
+mapEl.addEventListener("pointerdown",e=>{if(!panMode&&e.button!==1&&!e.shiftKey)return;e.preventDefault();e.stopPropagation();pan={id:e.pointerId,x:e.clientX,y:e.clientY};mapEl.setPointerCapture(e.pointerId);},true);
+mapEl.addEventListener("pointermove",e=>{if(!pan||pan.id!==e.pointerId)return;const r=mapEl.getBoundingClientRect();camera.x-=(e.clientX-pan.x)*576/camera.z/r.width;camera.y-=(e.clientY-pan.y)*332/camera.z/r.height;pan.x=e.clientX;pan.y=e.clientY;clampCamera();updateCamera()});
+for(const k of ["pointerup","pointercancel","lostpointercapture"])mapEl.addEventListener(k,()=>{pan=null});
