@@ -53,6 +53,7 @@ main{max-width:1600px;padding:clamp(12px,2.5vw,30px);margin:auto}.layout{grid-te
 
 .map-tools{display:flex;align-items:center;gap:6px;margin:8px 0;flex-wrap:wrap}.map-tools button{min-height:30px}.map-tools span{font:12px Verdana;color:var(--gold)}.map-tools button[aria-pressed=true]{outline:2px solid #f3ddab}.pan-mode,.pan-mode svg g{cursor:grab!important}.pan-mode{touch-action:none}.iso svg [data-a=tile]:hover>polygon{stroke:#f9df94;stroke-width:2}.monster-bob{animation:bob .7s ease-in-out infinite alternate}@keyframes bob{to{transform:translateY(-2px)}}@media(prefers-reduced-motion:reduce){.monster-bob{animation:none}}
 @media(min-width:851px){main{padding:12px 24px}.layout{margin-top:10px}.iso svg{max-height:calc(100vh - 295px);min-height:260px;background:#304c30}.card{max-height:calc(100vh - 170px);overflow:auto}}
+.combat-hud{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;font:12px Verdana}.fighter{animation:clash .35s ease-in-out infinite alternate}.fighter.enemy{animation-direction:alternate-reverse}@keyframes clash{to{transform:translateX(-5px)}}.damage{font:bold 15px Georgia;paint-order:stroke;stroke:#222;stroke-width:2px;animation:floatDamage .8s ease-out forwards}@keyframes floatDamage{to{transform:translateY(-16px);opacity:.15}}#battleResult{position:fixed;z-index:20;inset:0;background:#0009;display:grid;place-items:center;padding:20px}#battleResult[hidden]{display:none}#battleResult>div{max-width:480px;background:#20291e;border:2px solid #cba65e;border-radius:12px;padding:24px;color:#f2e5c7;text-align:center;box-shadow:0 12px 60px #000a}#battleTitle{font: bold 32px Georgia}#battleText{line-height:1.6;margin:16px 0}@media(prefers-reduced-motion:reduce){.fighter,.damage{animation:none}}
 </style>
 </head>
 <body>
@@ -64,6 +65,7 @@ main{max-width:1600px;padding:clamp(12px,2.5vw,30px);margin:auto}.layout{grid-te
  <section class="card"><div class="section-heading"><span>COMMAND CENTER</span><small>Manage your realm</small></div><div class="tabs" id="tabs"></div><div id="panel"></div></section>
 </div>
 </main>
-<script src="game.js?v=2.2"></script>
+<div id="battleResult" hidden><div role="dialog" aria-label="Battle result"><h2 id="battleTitle"></h2><p id="battleText"></p><button id="battleClose">Continue</button></div></div>
+<script src="game.js?v=2.3"></script>
 </body>
 </html>
