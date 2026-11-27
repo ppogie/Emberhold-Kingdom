@@ -162,6 +162,7 @@ function resourceStockLabel(n){
     return RESOURCE_NAMES[n.type]+' · '+Math.ceil(n.left)+' / '+resourceCapacity(n);
 }
 function drawResourceStock(n,p){
+    if(!S.units.some(u=>u.hp>0&&!u.target&&u.job?.type===n.type&&u.job.x===n.x&&u.job.y===n.y))return;
     const z=zoom,width=34*z;
     const fraction=clamp(n.left/resourceCapacity(n),0,1);
     const y=p.y+6*z;
