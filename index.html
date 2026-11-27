@@ -663,53 +663,71 @@ function productionTick(dt){
         }
     }
 }
-function drawWallSection(b,x0,y0,x1,y1){
-    const z=zoom,colors=wallLevel(b).colors;
-    const point=(x,y,h=0)=>{
-        const p=project(b.x+x,b.y+y);
-        return {x:p.x,y:p.y-h*z};
+function drawWallSection(b,x0,y0,x1,y1,post=false){
+    const colors=wallLevel(b).colors;
+    const edge='#594a40';
+    const point=(x,y,h)=>{const p=project(b.x+x,b.y+y);return {x:p.x,y:p.y-h*zoom}};
+    const block=(ax,ay,bx,by,low,high,face,shade,top)=>{
+        const a=point(ax,by,low),c=point(bx,by,low),d=point(bx,ay,low);
+        const at=point(ax,by,high),ct=point(bx,by,high),dt=point(bx,ay,high);
+        poly([d,c,ct,dt],shade,edge);
+        poly([a,c,ct,at],face,edge);
+        poly([at,ct,dt,point(ax,ay,high)],top,edge);
     };
-    const face=(length,edge,colors)=>{
-        const brick=(a,c,low,high,color,stroke)=>
-            poly([edge(a,low),edge(c,low),edge(c,high),edge(a,high)],color,stroke);
+    const face=(length,at,palette)=>{
+        const count=Math.max(1,Math.round(length*5));
         for(let row=0;row<3;row++){
-            const count=Math.max(1,Math.round(length*5));
             let left=0;
             for(let i=1;i<=count;i++){
-                const right=i===count?1:(i-(row%2)*.35)/count;
-                brick(left,right,row*6,(row+1)*6,colors[(row+i)%colors.length],'#64513e');
+                const right=i===count?1:(i-(row%2)*.4)/count;
+                const low=2+row*6,high=low+6;
+                poly([at(left,low),at(right,low),at(right,high),at(left,high)],
+                    palette[(row+i)%palette.length],edge);
                 left=right;
             }
         }
-        brick(0,1,18,21,colors[0],'#6d553d');
     };
-    face(y1-y0,(t,h)=>point(x1,y0+(y1-y0)*t,h),colors.slice(0,3));
+    block(x0,y0,x1,y1,0,20,colors[3],colors[1],colors[4]);
     face(x1-x0,(t,h)=>point(x0+(x1-x0)*t,y1,h),colors.slice(3));
-    poly([point(x0,y0,21),point(x1,y0,21),point(x1,y1,21),point(x0,y1,21)],colors[5]);
-    const alongX=x1-x0>=y1-y0;
-    const tileLength=alongX?x1-x0:y1-y0;
-    const capCount=Math.max(1,Math.round(tileLength*4));
-    for(let i=0;i<capCount;i++){
-        const from=i/capCount,to=(i+.83)/capCount;
-        const ax=alongX?x0+(x1-x0)*from:x0;
-        const bx=alongX?x0+(x1-x0)*to:x1;
-        const ay=alongX?y0:y0+(y1-y0)*from;
-        const by=alongX?y1:y0+(y1-y0)*to;
-        poly([point(ax,ay,22),point(bx,ay,22),point(bx,by,22),point(ax,by,22)],colors[5],'#64513e');
+    face(y1-y0,(t,h)=>point(x1,y0+(y1-y0)*t,h),colors.slice(0,3));
+    block(x0,y0,x1,y1,20,23,colors[4],colors[0],colors[5]);
+    if(post){
+        const inset=.035;
+        block(x0+inset,y0+inset,x1-inset,y1-inset,23,31,colors[3],colors[0],colors[4]);
+        block(x0,y0,x1,y1,31,34,colors[4],colors[1],colors[5]);
+        return;
+    }
+    const horizontal=x1-x0>=y1-y0;
+    const length=horizontal?x1-x0:y1-y0;
+    const count=Math.max(1,Math.round(length*3));
+    for(let i=0;i<count;i++){
+        const from=(i+.19)/count,to=(i+.78)/count;
+        block(horizontal?x0+length*from:x0+.025,
+            horizontal?y0+.025:y0+length*from,
+            horizontal?x0+length*to:x1-.025,
+            horizontal?y1-.025:y0+length*to,
+            23,28,colors[3],colors[1],colors[5]);
     }
 }
 function drawDefense(b,previewPlots=[]){
     const connects=(dx,dy)=>[S.buildings,previewPlots].some(plots=>
-        plots.some(v=>DEFENSE_HP[v.type]&&v.hp!==0&&v.x===b.x+dx&&v.y===b.y+dy));
+        plots.some(v=>v.type==='wall'&&(v.hp??1)>0&&v.x===b.x+dx&&v.y===b.y+dy));
     const left=connects(-1,0),right=connects(1,0),back=connects(0,-1),front=connects(0,1);
-    const half=.17;
-    if((back||front)&&!left&&!right){
-        drawWallSection(b,-half,back?-.5:-half,half,front?.5:half);
+    const half=.16;
+    if(left&&right&&!front&&!back){
+        drawWallSection(b,-.5,-half,.5,half);
         return;
     }
-    if(back)drawWallSection(b,-half,-.5,half,-half);
-    drawWallSection(b,left?-.5:-half,-half,right?.5:half,half);
-    if(front)drawWallSection(b,-half,half,half,.5);
+    if(back&&front&&!left&&!right){
+        drawWallSection(b,-half,-.5,half,.5);
+        return;
+    }
+    const post=.22;
+    if(back)drawWallSection(b,-half,-.5,half,-post);
+    if(left)drawWallSection(b,-.5,-half,-post,half);
+    drawWallSection(b,-post,-post,post,post,true);
+    if(right)drawWallSection(b,post,-half,.5,half);
+    if(front)drawWallSection(b,-half,post,half,.5);
 }
 function drawWheat(b){
     if(!b.cycle||b.left)return;
